@@ -1,135 +1,109 @@
 import streamlit as st
 
 st.set_page_config(
-    page_title="MiniStore Support",
-    page_icon="💬",
-    layout="wide"
+    page_title="Support Chatbot",
+    page_icon="💬"
 )
 
-# ---------------------------------------------------
-# Product Knowledge Base
-# ---------------------------------------------------
+st.title("💬 MiniStore Support")
+
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+
+# Product knowledge base
 products = {
-    "headphones": "$79.99",
-    "fitness watch": "$129.99",
-    "keyboard": "$89.99",
-    "backpack": "$54.99",
-    "coffee maker": "$39.99",
-    "desk lamp": "$29.99"
+    "wireless bluetooth headphones": {
+        "price": "$79.99",
+        "category": "Electronics"
+    },
+    "smart fitness watch": {
+        "price": "$129.99",
+        "category": "Wearables"
+    },
+    "mechanical keyboard": {
+        "price": "$89.99",
+        "category": "Electronics"
+    },
+    "minimalist backpack": {
+        "price": "$54.99",
+        "category": "Fashion"
+    },
+    "portable coffee maker": {
+        "price": "$39.99",
+        "category": "Home & Kitchen"
+    },
+    "led desk lamp": {
+        "price": "$29.99",
+        "category": "Home & Kitchen"
+    }
 }
 
-# ---------------------------------------------------
-# Chat Memory
-# ---------------------------------------------------
-if "messages" not in st.session_state:
-    st.session_state.messages = [
-        {
-            "role": "assistant",
-            "content":
-            "Hello! Welcome to MiniStore Support. How can I help you today?"
-        }
-    ]
-
-# ---------------------------------------------------
-# Chatbot Logic
-# ---------------------------------------------------
-def generate_response(user_input):
-
-    query = user_input.lower()
+def get_response(user_text):
+    text = user_text.lower()
 
     # Product Questions
-    if any(product in query for product in products):
-        for product, price in products.items():
-            if product in query:
-                return f"Our {product.title()} is currently available for {price}."
+    for product, details in products.items():
+        if product in text:
+            return (
+                f"{product.title()} costs {details['price']} "
+                f"and belongs to the {details['category']} category."
+            )
 
     # Delivery
-    if any(word in query for word in ["delivery", "shipping", "ship"]):
-        return (
-            "Standard delivery takes 3-5 business days. "
-            "Express shipping takes 1-2 business days."
-        )
+    if any(word in text for word in ["delivery", "shipping"]):
+        return "Delivery usually takes 3–5 business days."
 
     # Refunds
-    if "refund" in query:
-        return (
-            "Refunds are processed within 5-7 business days after approval."
-        )
+    if "refund" in text:
+        return "Refunds are processed within 5–7 business days."
 
     # Returns
-    if "return" in query:
-        return (
-            "Products can be returned within 30 days if unused and in original packaging."
-        )
+    if "return" in text:
+        return "Products can be returned within 30 days of purchase."
 
     # Payment
-    if any(word in query for word in ["payment", "card", "upi", "paypal"]):
+    if any(word in text for word in ["payment", "upi", "card"]):
         return (
-            "We accept Credit Cards, Debit Cards, UPI, Net Banking, and PayPal."
+            "We accept UPI, Credit Cards, Debit Cards and Net Banking."
         )
 
     # Order Status
-    if any(word in query for word in ["order", "status", "track"]):
+    if any(word in text for word in ["order", "track", "status"]):
         return (
-            "For demo purposes, your latest order is currently being processed."
+            "Your order is currently being processed and will ship soon."
         )
 
     return (
-        "I'm not sure about that. "
-        "You can ask me about products, refunds, returns, shipping, payments, or order status."
+        "I can help with products, delivery, refunds, returns, "
+        "payments and order tracking."
     )
 
-# ---------------------------------------------------
-# Header
-# ---------------------------------------------------
-st.title("💬 MiniStore Support Chatbot")
+# Display chat history
+for msg in st.session_state.messages:
+    with st.chat_message(msg["role"]):
+        st.markdown(msg["content"])
 
-st.write(
-    "Ask questions about products, delivery, refunds, returns, payments, or order status."
-)
+prompt = st.chat_input("Ask a question...")
 
-# ---------------------------------------------------
-# Display Chat History
-# ---------------------------------------------------
-for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.markdown(message["content"])
+if prompt:
 
-# ---------------------------------------------------
-# Chat Input
-# ---------------------------------------------------
-user_prompt = st.chat_input(
-    "Type your question here..."
-)
-
-if user_prompt:
-
-    st.session_state.messages.append(
-        {
-            "role": "user",
-            "content": user_prompt
-        }
-    )
+    st.session_state.messages.append({
+        "role": "user",
+        "content": prompt
+    })
 
     with st.chat_message("user"):
-        st.markdown(user_prompt)
+        st.markdown(prompt)
 
-    response = generate_response(user_prompt)
+    response = get_response(prompt)
 
-    st.session_state.messages.append(
-        {
-            "role": "assistant",
-            "content": response
-        }
-    )
+    st.session_state.messages.append({
+        "role": "assistant",
+        "content": response
+    })
 
     with st.chat_message("assistant"):
         st.markdown(response)
 
-# ---------------------------------------------------
-# Navigation Back Home
-# ---------------------------------------------------
-st.page_link(
-    "app.py",
-    label="⬅ Back to Home"
-)
+if st.button("⬅ Back to Home"):
+    st.switch_page("app.py")

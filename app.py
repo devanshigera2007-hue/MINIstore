@@ -231,3 +231,31 @@ st.markdown(
     "<center>© 2026 MiniStore • Demo E-Commerce Website Built with Streamlit</center>",
     unsafe_allow_html=True
 )
+# ----------------------------------------
+# Floating Support Button
+# ----------------------------------------
+st.markdown("""
+<style>
+.support-button {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    z-index: 999;
+}
+
+.support-button button {
+    background-color: #4F46E5;
+    color: white;
+    border-radius: 50px;
+    padding: 12px 20px;
+    border: none;
+    font-weight: bold;
+}
+</style>
+""", unsafe_allow_html=True)
+
+col1, col2, col3 = st.columns([8, 1, 1])
+
+with col3:
+    if st.button("💬 Support"):
+        st.switch_page("pages/1_Support_Chatbot.py")
